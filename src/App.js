@@ -1,6 +1,10 @@
-import { Table } from "./components/MUXTable";
+import { DataTable } from "./components/MUXTable";
 const App = () => {
-  return <Table />;
+  return (
+    <div>
+      <DataTable key="datatable" />
+    </div>
+  );
 };
 
 export default App;

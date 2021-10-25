@@ -1,15 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "@awesomecomponents/mux/core/typography/assets/fonts/fonts.css";
-import { MUXProvider } from "@awesomecomponents/mux";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
   <React.StrictMode>
-    <MUXProvider>
-      <App />
-    </MUXProvider>
+    <App />
   </React.StrictMode>,
   document.getElementById("root")
 );

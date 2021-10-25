@@ -1,1 +1,1 @@
-export { Table } from './Table.js'
+export { DataTable } from './DataTable.js'

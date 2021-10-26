@@ -70,10 +70,6 @@ export const DataTable = () => {
     })();
   }, []);
 
-  // useEffect(() => {
-  //   setPageNum(1);
-  // }, [maxItemsPerPage]);
-
   const updateTableControls = (newValue) => {
     setMaxItemsPerPage(newValue);
     setPageNum(1);

@@ -19,6 +19,7 @@ export const DataTable = () => {
   const [maxItemsPerPage, setMaxItemsPerPage] = useState(ITEMS_PER_PAGE[0]);
   const [pageNum, setPageNum] = useState(1);
   const emptyTableMessage = "No results found";
+  const lowerBoundItemNumber = ((pageNum - 1) * maxItemsPerPage) ;
   const tableHeader = [
     {
       id: "commentId",
@@ -37,6 +38,13 @@ export const DataTable = () => {
       label: "Comment Text"
     },
   ];
+  const upperBoundItemNumber = () => {
+    if ((pageNum * maxItemsPerPage) < tableData.length) {
+      return (pageNum * maxItemsPerPage)
+    } else {
+      return tableData.length
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -59,9 +67,17 @@ export const DataTable = () => {
         }
       });
       setTableData(fetchData);
-      setPageNum(1);
     })();
   }, []);
+
+  // useEffect(() => {
+  //   setPageNum(1);
+  // }, [maxItemsPerPage]);
+
+  const updateTableControls = (newValue) => {
+    setMaxItemsPerPage(newValue);
+    setPageNum(1);
+  }
 
   return (<>
     {
@@ -70,16 +86,22 @@ export const DataTable = () => {
         <>
           <div className={styles.inputBar}>
             <Pagination
+              id="pagination-datatable"
               totalItems={Math.ceil(tableData.length / maxItemsPerPage)}
               currentItem={pageNum}
-              onChange={setPageNum}
+              onChange={(value) => setPageNum(value)}
               currentItemAriaLabel="Current Page"
               navigationAriaLabel="Page Control"
             />
-            <Label>Displaying { ((pageNum - 1) * maxItemsPerPage) + 1 } - { pageNum * maxItemsPerPage < tableData.length || tableData.length } of { tableData.length } results</Label>
+            <Label>
+              {
+                `Displaying ${lowerBoundItemNumber + 1} -
+                ${upperBoundItemNumber()} of ${tableData.length} results`
+              }
+            </Label>
             <Dropdown
               id="maxItemsDropdown"
-              onChange={setMaxItemsPerPage}
+              onChange={(value) => updateTableControls(value)}
               value={maxItemsPerPage.toString()}
               dropdownItems={
                 ITEMS_PER_PAGE.map(
@@ -102,7 +124,7 @@ export const DataTable = () => {
             rows={
               tableData.filter(
                 (item, index) =>
-                  (index >= ((pageNum - 1) * maxItemsPerPage))
+                  (index >= lowerBoundItemNumber)
                     && (index < (pageNum * maxItemsPerPage))
               )
             }

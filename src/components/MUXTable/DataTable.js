@@ -4,14 +4,18 @@ import {
 } from "react";
 import {
   Table,
-  Pagination
+  Pagination,
+  Dropdown
 } from "@awesomecomponents/mux/core/components"
 import axios from "axios";
 
-const fetchUrl = "https://jsonplaceholder.typicode.com/comments";
+const FETCH_URL = "https://jsonplaceholder.typicode.com/comments";
+const ITEMS_PER_PAGE = [10, 25, 50, 75, 100];
 
 export const DataTable = () => {
   const [tableData, setTableData] = useState([]);
+  const [maxItemsPerPage, setMaxItemsPerPage] = useState(ITEMS_PER_PAGE[0]);
+  const [pageNum, setPageNum] = useState(1);
   const emptyTableMessage = "No results found";
   const tableHeader = [
     {
@@ -34,7 +38,7 @@ export const DataTable = () => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await axios.get(fetchUrl);
+      const { data } = await axios.get(FETCH_URL);
       const fetchData = data.map(comment => {
         const { id, name, email, body } = comment;
         return {
@@ -53,6 +57,7 @@ export const DataTable = () => {
         }
       });
       setTableData(fetchData);
+      setPageNum(1);
     })();
   }, []);
 
@@ -60,12 +65,39 @@ export const DataTable = () => {
     {
       tableData?.length > 0 &&
       (
-        <Table
-          id="dataTable"
-          header={tableHeader}
-          emptyTableMessage={emptyTableMessage}
-          rows={tableData}
-        />
+        <>
+          <Pagination
+            totalItems={tableData.length / maxItemsPerPage}
+            currentItem={pageNum}
+            onChange={setPageNum}
+          />
+          <Dropdown
+            onChange={setMaxItemsPerPage}
+            value={maxItemsPerPage}
+            dropdownItems={
+              ITEMS_PER_PAGE.map(
+                item => {
+                  return {
+                    label: item,
+                    value: item
+                  }
+                }
+              )
+            }
+          />
+          <Table
+            id="dataTable"
+            header={tableHeader}
+            emptyTableMessage={emptyTableMessage}
+            rows={
+              tableData.filter(
+                (item, index) =>
+                  (index >= ((pageNum - 1) * maxItemsPerPage))
+                    && (index < (pageNum * maxItemsPerPage))
+              )
+            }
+          />
+        </>
       )
     }
     { tableData.length === 0 && <span>Spinner</span>}

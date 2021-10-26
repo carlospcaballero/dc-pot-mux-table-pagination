@@ -5,9 +5,11 @@ import {
 import {
   Table,
   Pagination,
-  Dropdown
+  Dropdown,
+  Label,
 } from "@awesomecomponents/mux/core/components"
 import axios from "axios";
+import styles from './Datatable.module.css';
 
 const FETCH_URL = "https://jsonplaceholder.typicode.com/comments";
 const ITEMS_PER_PAGE = [10, 25, 50, 75, 100];
@@ -66,25 +68,33 @@ export const DataTable = () => {
       tableData?.length > 0 &&
       (
         <>
-          <Pagination
-            totalItems={tableData.length / maxItemsPerPage}
-            currentItem={pageNum}
-            onChange={setPageNum}
-          />
-          <Dropdown
-            onChange={setMaxItemsPerPage}
-            value={maxItemsPerPage}
-            dropdownItems={
-              ITEMS_PER_PAGE.map(
-                item => {
-                  return {
-                    label: item,
-                    value: item
+          <div className={styles.inputBar}>
+            <Pagination
+              totalItems={Math.ceil(tableData.length / maxItemsPerPage)}
+              currentItem={pageNum}
+              onChange={setPageNum}
+              currentItemAriaLabel="Current Page"
+              navigationAriaLabel="Page Control"
+            />
+            <Label>Displaying { ((pageNum - 1) * maxItemsPerPage) + 1 } - { pageNum * maxItemsPerPage < tableData.length || tableData.length } of { tableData.length } results</Label>
+            <Dropdown
+              id="maxItemsDropdown"
+              onChange={setMaxItemsPerPage}
+              value={maxItemsPerPage.toString()}
+              dropdownItems={
+                ITEMS_PER_PAGE.map(
+                  item => {
+                    return {
+                      label: item.toString(),
+                      value: item.toString()
+                    }
                   }
-                }
-              )
-            }
-          />
+                )
+              }
+            />
+          </div>
+
+
           <Table
             id="dataTable"
             header={tableHeader}

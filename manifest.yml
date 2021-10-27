@@ -1,0 +1,9 @@
+applications:
+- name: dc-pot-mux-table-pagination
+  routes:
+    - route: dc-pot-mux-table-pagination.apps.cac.preview.pcf.manulife.com
+  buildpacks:
+    - nodejs_buildpack
+  memory: 256M
+  disk_quota: 256M
+

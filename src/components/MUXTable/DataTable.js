@@ -13,36 +13,38 @@ import styles from './Datatable.module.css';
 
 const FETCH_URL = "https://jsonplaceholder.typicode.com/comments";
 const ITEMS_PER_PAGE = [10, 25, 50, 75, 100];
+const EMPTY_TABLE_MESSAGE = "No results found";
+const TABLE_HEADER = [
+  {
+    id: "commentId",
+    label: "Comment ID"
+  },
+  {
+    id: "commentFrom",
+    label: "From"
+  },
+  {
+    id: "commentTitle",
+    label: "Comment Title"
+  },
+  {
+    id: "commentText",
+    label: "Comment Text"
+  },
+];
 
 export const DataTable = () => {
   const [tableData, setTableData] = useState([]);
   const [maxItemsPerPage, setMaxItemsPerPage] = useState(ITEMS_PER_PAGE[0]);
   const [pageNum, setPageNum] = useState(1);
-  const emptyTableMessage = "No results found";
-  const lowerBoundItemNumber = ((pageNum - 1) * maxItemsPerPage) ;
-  const tableHeader = [
-    {
-      id: "commentId",
-      label: "Comment ID"
-    },
-    {
-      id: "commentFrom",
-      label: "From"
-    },
-    {
-      id: "commentTitle",
-      label: "Comment Title"
-    },
-    {
-      id: "commentText",
-      label: "Comment Text"
-    },
-  ];
-  const upperBoundItemNumber = () => {
-    if ((pageNum * maxItemsPerPage) < tableData.length) {
-      return (pageNum * maxItemsPerPage)
+  const lowerBoundItemNumber = ((pageNum - 1) * maxItemsPerPage);
+  const upperBoundItemNumber = pageNum * maxItemsPerPage;
+
+  const pageBoundsComputation = (itemCount) => {
+    if (itemCount < tableData.length) {
+      return itemCount;
     } else {
-      return tableData.length
+      return tableData.length;
     }
   }
 
@@ -62,8 +64,8 @@ export const DataTable = () => {
             label: name,
           },
           commentText: {
-            label: body
-          }
+            label: body,
+          },
         }
       });
       setTableData(fetchData);
@@ -72,7 +74,6 @@ export const DataTable = () => {
 
   const updateTableControls = (newValue) => {
     setMaxItemsPerPage(newValue);
-    setPageNum(1);
   }
 
   return (<>
@@ -82,41 +83,49 @@ export const DataTable = () => {
         <>
           <div className={styles.inputBar}>
             <Pagination
-              id="pagination-datatable"
-              totalItems={Math.ceil(tableData.length / maxItemsPerPage)}
               currentItem={pageNum}
-              onChange={(value) => setPageNum(value)}
               currentItemAriaLabel="Current Page"
+              id="pagination-datatable"
               navigationAriaLabel="Page Control"
-            />
-            <Label>
-              {
-                `Displaying ${lowerBoundItemNumber + 1} -
-                ${upperBoundItemNumber()} of ${tableData.length} results`
-              }
-            </Label>
-            <Dropdown
-              id="maxItemsDropdown"
-              onChange={(value) => updateTableControls(value)}
-              value={maxItemsPerPage.toString()}
-              dropdownItems={
-                ITEMS_PER_PAGE.map(
-                  item => {
-                    return {
-                      label: item.toString(),
-                      value: item.toString()
-                    }
-                  }
+              onChange={(value) => setPageNum(value)}
+              totalItems={
+                Math.ceil(
+                  tableData.length / maxItemsPerPage
                 )
               }
             />
+            <Label>
+              {
+                `Displaying ${pageBoundsComputation(lowerBoundItemNumber) + 1} -
+                ${pageBoundsComputation(upperBoundItemNumber)}
+                of ${tableData.length} results`
+              }
+            </Label>
+            <div className={styles.pageCountDropdown}>
+              <Label>Rows per page:</Label>
+              <Dropdown
+                dropdownItems={
+                  ITEMS_PER_PAGE.map(
+                    item => {
+                      return {
+                        label: item.toString(),
+                        value: item.toString()
+                      }
+                    }
+                  )
+                }
+                id="maxItemsDropdown"
+                onChange={(value) => updateTableControls(value)}
+                width="100px"
+                value={maxItemsPerPage.toString()}
+              />
+            </div>
+
           </div>
-
-
           <Table
+            emptyTableMessage={EMPTY_TABLE_MESSAGE}
+            header={TABLE_HEADER}
             id="dataTable"
-            header={tableHeader}
-            emptyTableMessage={emptyTableMessage}
             rows={
               tableData.filter(
                 (item, index) =>
